@@ -3,8 +3,8 @@ A lightweight macOS menu bar focus timer. Focal lives in your menu bar and helps
 
 **Features**  
 🎯 Menu bar native — no dock icon, stays out of your way  
-⏱️ Simple mode — set any custom duration (hours/minutes/seconds), plus 25m/45m/1hr quick presets. 
-🍅 Pomodoro mode — automatic work/break cycling with configurable work length, short break, long break, and sessions before a long break. 
+⏱️ Simple mode — set any custom duration (hours/minutes/seconds), plus 25m/45m/1hr quick presets  
+🍅 Pomodoro mode — automatic work/break cycling with configurable work length, short break, long break, and sessions before a long break  
 🔔 Sound alerts on completion, with your choice of macOS system sounds  
 📬 Native macOS notifications when a session ends  
 🚀 Optional launch at login  
