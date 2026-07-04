@@ -62,12 +62,12 @@
   }
 
   /* ---------- Nav ---------- */
-  nav.wrap{
+  .navbar{
+    width: 100%;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding-top: 28px;
-    padding-bottom: 28px;
+    padding: 24px 40px;
   }
   .brand{
     display:flex;
@@ -402,6 +402,7 @@
   @media (max-width: 560px){
     h1{ font-size: 34px; }
     .menubar-mock{ width: 100%; max-width: 268px; }
+    .navbar{ padding: 20px 20px; }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -413,12 +414,12 @@
 
 <div class="bg-field"></div>
 
-<nav class="wrap">
+<nav class="navbar">
   <div class="brand">
     <span class="brand-mark">🎯</span>
     Focal
   </div>
-  <a class="nav-link" href="Focal.dmg" download>Download</a>
+  <a class="nav-link" href="https://github.com/mazebeamtech/Focal/releases" target="_blank" rel="noopener">Download</a>
 </nav>
 
 <header class="hero wrap">
@@ -459,13 +460,13 @@
   </div>
 
   <div class="download-row" id="download">
-    <a class="btn-download" href="Focal.dmg" download>
+    <a class="btn-download" href="https://github.com/mazebeamtech/Focal/releases" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 3v13"/>
         <path d="M7 11l5 5 5-5"/>
         <path d="M4 20h16"/>
       </svg>
-      Download for Mac
+      Download on GitHub
     </a>
     <a class="btn-github" href="https://github.com/mazebeamtech/Focal" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="currentColor">
