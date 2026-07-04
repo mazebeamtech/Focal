@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Focal — a lightweight menu bar focus timer</title>
+<style>
+  :root{
+    --bg: #141414;
+    --bg-raised: #1c1c1e;
+    --hairline: rgba(255,255,255,0.09);
+    --text: #f3f1ec;
+    --text-dim: rgba(243,241,236,0.58);
+    --text-faint: rgba(243,241,236,0.36);
+    --tomato: #ff5b3d;
+    --tomato-soft: rgba(255,91,61,0.14);
+    --ring-track: rgba(255,255,255,0.10);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  .wrap{
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---------- Nav ---------- */
+  nav.wrap{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    font-weight:600;
+    font-size:15px;
+    letter-spacing:-0.01em;
+  }
+  .brand-mark{
+    width:20px; height:20px;
+    border-radius:6px;
+    background: var(--tomato);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+  }
+  .nav-link{
+    color: var(--text-dim);
+    text-decoration:none;
+    font-size:14px;
+    border:1px solid var(--hairline);
+    padding:7px 14px;
+    border-radius:20px;
+    transition: color .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .nav-link:hover{
+    color: var(--text);
+    border-color: rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.04);
+  }
+
+  /* ---------- Hero ---------- */
+  header.hero{
+    padding: 40px 0 72px;
+    text-align:center;
+  }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    font-size:12.5px;
+    color: var(--text-dim);
+    background: var(--bg-raised);
+    border:1px solid var(--hairline);
+    padding: 6px 13px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+  }
+  .eyebrow .dot{
+    width:6px; height:6px;
+    border-radius:50%;
+    background: var(--tomato);
+  }
+
+  h1{
+    font-size: 46px;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    font-weight: 650;
+    margin: 0 0 18px;
+  }
+  h1 span{ color: var(--tomato); }
+
+  .tagline{
+    max-width: 520px;
+    margin: 0 auto 40px;
+    font-size: 17px;
+    color: var(--text-dim);
+    letter-spacing: -0.005em;
+  }
+
+  /* ---------- Menu bar mock (signature element) ---------- */
+  .stage{
+    display:flex;
+    justify-content:center;
+    margin-bottom: 44px;
+  }
+
+  .menubar-mock{
+    width: 268px;
+    background: rgba(30,30,32,0.9);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--hairline);
+    border-radius: 14px;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,0,0,0.2);
+    padding: 18px 20px 20px;
+    text-align:left;
+  }
+
+  .mm-titlebar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .mm-title{
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .mm-gear{
+    width:22px;height:22px;
+    border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
+    color: var(--text-faint);
+    font-size:13px;
+  }
+
+  .mm-modes{
+    display:flex;
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 3px;
+    margin-bottom: 16px;
+  }
+  .mm-mode{
+    flex:1;
+    text-align:center;
+    font-size:11.5px;
+    padding: 5px 0;
+    border-radius: 6px;
+    color: var(--text-dim);
+  }
+  .mm-mode.active{
+    background: rgba(255,255,255,0.14);
+    color: var(--text);
+    font-weight:600;
+  }
+
+  .mm-status{
+    text-align:center;
+    font-size:11.5px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+
+  .ring-holder{
+    display:flex;
+    justify-content:center;
+    margin-bottom: 18px;
+    position:relative;
+  }
+  .ring-holder svg{ display:block; }
+  .ring-time{
+    position:absolute;
+    top:0; left:0; right:0; bottom:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 21px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    letter-spacing: -0.01em;
+  }
+
+  .mm-buttons{
+    display:flex;
+    gap:8px;
+  }
+  .mm-btn{
+    flex:1;
+    text-align:center;
+    font-size:12.5px;
+    padding: 7px 0;
+    border-radius: 7px;
+  }
+  .mm-btn.primary{
+    background: var(--tomato);
+    color: #1a0d09;
+    font-weight:600;
+  }
+  .mm-btn.secondary{
+    background: rgba(255,255,255,0.08);
+    color: var(--text-dim);
+  }
+
+  /* ---------- Download ---------- */
+  .download-row{
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .btn-download{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    background: var(--tomato);
+    color: #1a0d09;
+    font-weight: 650;
+    font-size: 15.5px;
+    text-decoration:none;
+    padding: 13px 26px;
+    border-radius: 12px;
+    letter-spacing:-0.01em;
+    transition: transform .15s ease, box-shadow .15s ease;
+    box-shadow: 0 8px 24px -8px rgba(255,91,61,0.55);
+  }
+  .btn-download:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px -8px rgba(255,91,61,0.65);
+  }
+  .btn-download svg{ width:16px; height:16px; }
+
+  .btn-github{
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    background: transparent;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration:none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: 1px solid var(--hairline);
+    letter-spacing:-0.01em;
+    transition: background .15s ease, border-color .15s ease, transform .15s ease;
+  }
+  .btn-github:hover{
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.22);
+    transform: translateY(-1px);
+  }
+  .btn-github svg{ width:17px; height:17px; }
+
+  .meta-line{
+    font-size: 13px;
+    color: var(--text-faint);
+  }
+  .meta-line code{
+    background: rgba(255,255,255,0.06);
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  /* ---------- Features ---------- */
+  section.features{
+    padding: 20px 0 90px;
+    border-top: 1px solid var(--hairline);
+  }
+  .features-head{
+    text-align:center;
+    margin: 56px 0 40px;
+  }
+  .features-head h2{
+    font-size: 26px;
+    letter-spacing:-0.02em;
+    font-weight: 650;
+    margin: 0 0 8px;
+  }
+  .features-head p{
+    color: var(--text-dim);
+    font-size: 15px;
+    margin:0;
+  }
+
+  .feature-list{
+    display:flex;
+    flex-direction:column;
+  }
+  .feature{
+    display:flex;
+    gap:18px;
+    align-items:flex-start;
+    padding: 22px 4px;
+    border-top: 1px solid var(--hairline);
+  }
+  .feature:last-child{ border-bottom: 1px solid var(--hairline); }
+
+  .feature-icon{
+    width:38px; height:38px;
+    flex-shrink:0;
+    border-radius: 10px;
+    background: var(--tomato-soft);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 17px;
+  }
+  .feature-body h3{
+    margin: 4px 0 5px;
+    font-size: 15.5px;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  .feature-body p{
+    margin:0;
+    font-size: 14.5px;
+    color: var(--text-dim);
+    max-width: 480px;
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    border-top: 1px solid var(--hairline);
+    padding: 28px 0 40px;
+  }
+  .footer-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  footer p{
+    margin:0;
+    font-size: 13px;
+    color: var(--text-faint);
+  }
+
+  @media (max-width: 560px){
+    h1{ font-size: 34px; }
+    .menubar-mock{ width: 100%; max-width: 268px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="wrap">
+  <div class="brand">
+    <span class="brand-mark">🎯</span>
+    Focal
+  </div>
+  <a class="nav-link" href="#download">Download</a>
+</nav>
+
+<header class="hero wrap">
+  <span class="eyebrow"><span class="dot"></span> v1.0.0 · for macOS 14+</span>
+
+  <h1>Stay focused,<br>without the <span>fuss.</span></h1>
+  <p class="tagline">
+    A lightweight macOS menu bar focus timer. Focal lives in your menu bar and
+    helps you stay on task with Simple and Pomodoro timer modes, customizable
+    durations, sound alerts, and daily session tracking — without ever getting
+    in your way.
+  </p>
+
+  <div class="stage">
+    <div class="menubar-mock">
+      <div class="mm-titlebar">
+        <span class="mm-title">Focal</span>
+        <span class="mm-gear">⚙</span>
+      </div>
+      <div class="mm-modes">
+        <div class="mm-mode active">Simple</div>
+        <div class="mm-mode">Pomodoro</div>
+      </div>
+      <div class="ring-holder">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle cx="55" cy="55" r="48" fill="none" stroke="var(--ring-track)" stroke-width="6"/>
+          <circle cx="55" cy="55" r="48" fill="none" stroke="var(--tomato)" stroke-width="6"
+                  stroke-linecap="round" stroke-dasharray="301.6" stroke-dashoffset="105"
+                  transform="rotate(-90 55 55)"/>
+        </svg>
+        <div class="ring-time">18:24</div>
+      </div>
+      <div class="mm-buttons">
+        <div class="mm-btn primary">Pause</div>
+        <div class="mm-btn secondary">Reset</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="download-row" id="download">
+    <a class="btn-download" href="Focal.dmg" download>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3v13"/>
+        <path d="M7 11l5 5 5-5"/>
+        <path d="M4 20h16"/>
+      </svg>
+      Download for Mac
+    </a>
+    <a class="btn-github" href="https://github.com/mazebeamtech/Focal" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55 0-.27-.01-1.16-.02-2.11-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.64 1.59.24 2.76.12 3.05.74.8 1.19 1.83 1.19 3.09 0 4.42-2.7 5.4-5.27 5.68.42.36.78 1.07.78 2.16 0 1.56-.01 2.82-.01 3.2 0 .3.2.66.79.55A10.53 10.53 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/>
+      </svg>
+      View on GitHub
+    </a>
+  </div>
+</header>
+
+<section class="features wrap">
+  <div class="features-head">
+    <h2>Everything a focus timer needs.</h2>
+    <p>Nothing it doesn't.</p>
+  </div>
+
+  <div class="feature-list">
+    <div class="feature">
+      <div class="feature-icon">🎯</div>
+      <div class="feature-body">
+        <h3>Menu bar native</h3>
+        <p>No dock icon, no clutter — Focal stays out of your way until you need it.</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">⏱️</div>
+      <div class="feature-body">
+        <h3>Simple mode</h3>
+        <p>Set any custom duration in hours, minutes, and seconds, or use the 25m / 45m / 1hr quick presets.</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">🍅</div>
+      <div class="feature-body">
+        <h3>Pomodoro mode</h3>
+        <p>Automatic work and break cycling, with configurable work length, short break, long break, and sessions before a long break.</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">🔔</div>
+      <div class="feature-body">
+        <h3>Sound alerts</h3>
+        <p>Get notified when a session completes, with your choice of macOS system sounds.</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">📬</div>
+      <div class="feature-body">
+        <h3>Native notifications</h3>
+        <p>A proper macOS notification appears the moment your session ends.</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">🚀</div>
+      <div class="feature-body">
+        <h3>Launch at login</h3>
+        <p>Optional — have Focal ready in your menu bar from the moment you log in.</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">📊</div>
+      <div class="feature-body">
+        <h3>Daily tracking</h3>
+        <p>See total minutes focused today and how many Pomodoros you've completed, at a glance.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <div class="footer-row">
+    <p>Focal · a lightweight focus timer for macOS</p>
+    <p>v1.0.0</p>
+  </div>
+</footer>
+
+</body>
+</html>
