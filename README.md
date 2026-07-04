@@ -1,5 +1,5 @@
 # Focal
-A lightweight macOS menu bar focus timer. Focal lives in your menu bar and helps you stay on task with Simple and Pomodoro timer modes, customizable durations, sound alerts, and daily session tracking — without ever getting in your way.  
+A lightweight macOS menu bar focus timer made from Swift. Focal lives in your menu bar and helps you stay on task with Simple and Pomodoro timer modes, customizable durations, sound alerts, and daily session tracking — without ever getting in your way.
 
 **Features**  
 🎯 Menu bar native — no dock icon, stays out of your way  
